@@ -92,7 +92,7 @@ def speak_text(synth: speechsdk.SpeechSynthesizer, text: str):
     if not text:
         return
     with _synth_lock:
-        # Fire-and-wait; real-time synthesis instead of async
+        # Fire-and-wait
         result = synth.speak_text_async(text).get()
         if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
             print(f"[TTS] ✔ {len(text)} chars")

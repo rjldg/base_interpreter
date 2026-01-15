@@ -9,12 +9,9 @@ from dotenv import load_dotenv
 
 import azure.cognitiveservices.speech as speechsdk
 
-# ============================================================
-# Load env
-# ============================================================
 load_dotenv()
 
-# Keys & region (prefer custom endpoint key if provided, like your current daemon)
+# Keys & region
 SPEECH_KEY = os.getenv("SPEECH_KEY", "")
 SPEECH_REGION = os.getenv("SPEECH_REGION", "")
 
@@ -25,30 +22,28 @@ CUSTOM_ENDPOINT_ID = ""
 CUSTOM_ENDPOINT_KEY = ""
 
 # Source/Target
-LOCALE = os.getenv("LOCALE", "en-US")                # source speech locale (your existing var)
-TARGET_LANGUAGE = os.getenv("TARGET_LANGUAGE", "es") # e.g., 'es', 'fr', 'de', 'ja', 'zh-Hans', 'en'
+LOCALE = os.getenv("LOCALE", "en-US")
+TARGET_LANGUAGE = os.getenv("TARGET_LANGUAGE", "it")
 
 # TTS
 TTS_VOICE = os.getenv("TTS_VOICE", "en-US-JennyNeural")
-USE_SPEAKER = True  # Use default speaker for synthesis output
+USE_SPEAKER = True  # default speaker for synthesis output
 
 # IO
 INPUT_DIR = os.getenv("INPUT_DIR", "./incoming_audio")
 USE_MIC = os.getenv("USE_MIC", "false").lower() == "true"
 
 # Segmentation / silence timeouts (same knobs you used)
-SEG_STRAT = os.getenv("SEGMENTATION_STRATEGY", "Semantic")  # Semantic/Coarse/Unknown
+SEG_STRAT = os.getenv("SEGMENTATION_STRATEGY", "Semantic")
 SEG_INIT_SILENCE_TIMEOUT = os.getenv("SEGMENTATION_INIT_SILENCE_TIMEOUT_MS", "800")
 SEG_END_SILENCE_TIMEOUT = os.getenv("SEGMENTATION_END_SILENCE_TIMEOUT_MS", "800")
 
-# Simple lock to avoid overlapping synth operations
 _synth_lock = threading.Lock()
 
 # ============================================================
 # Config builders
 # ============================================================
 def _resolve_subscription_key() -> str:
-    # Prefer the custom endpoint key when available, like your current daemon
     return CUSTOM_ENDPOINT_KEY or SPEECH_KEY
 
 def build_translation_config() -> speechsdk.translation.SpeechTranslationConfig:
@@ -61,22 +56,16 @@ def build_translation_config() -> speechsdk.translation.SpeechTranslationConfig:
         region=SPEECH_REGION,
     )
 
-    # Source language for STT
     tcfg.speech_recognition_language = LOCALE
 
-    # Target language(s) for translation
     tcfg.add_target_language(TARGET_LANGUAGE)
 
-    # Segmentation/timeout knobs (mirroring your existing properties)
     tcfg.set_property(speechsdk.PropertyId.Speech_SegmentationStrategy, SEG_STRAT)
     tcfg.set_property(speechsdk.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, SEG_INIT_SILENCE_TIMEOUT)
     tcfg.set_property(speechsdk.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, SEG_END_SILENCE_TIMEOUT)
 
-    # (Optional) profanity masking carries into translation results
     tcfg.set_profanity(speechsdk.ProfanityOption.Masked)
 
-    # If you have a custom endpoint (Custom Speech) for STT, you can try attaching it too
-    # Note: Custom endpoint integration with translation may not apply in all regions.
     if CUSTOM_ENDPOINT_ID:
         tcfg.endpoint_id = CUSTOM_ENDPOINT_ID
 
@@ -91,7 +80,6 @@ def build_synthesizer() -> speechsdk.SpeechSynthesizer:
         region=SPEECH_REGION,
     )
 
-    # Select voice for target language
     scfg.speech_synthesis_voice_name = TTS_VOICE
 
     audio_cfg = speechsdk.audio.AudioOutputConfig(use_default_speaker=USE_SPEAKER)
@@ -104,7 +92,7 @@ def speak_text(synth: speechsdk.SpeechSynthesizer, text: str):
     if not text:
         return
     with _synth_lock:
-        # Fire-and-wait; you can make this async if desired
+        # Fire-and-wait; real-time synthesis instead of async
         result = synth.speak_text_async(text).get()
         if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
             print(f"[TTS] ✔ {len(text)} chars")
@@ -125,7 +113,6 @@ def interpret_microphone():
     synth = build_synthesizer()
 
     def recognizing_cb(evt: speechsdk.translation.TranslationRecognitionEventArgs):
-        # Partial forming segment – useful to display live captions; we synthesize only on finalized segments.
         if evt.result.reason == speechsdk.ResultReason.TranslatingSpeech:
             partial = evt.result.translations.get(TARGET_LANGUAGE, "")
             if partial:
@@ -137,16 +124,12 @@ def interpret_microphone():
             tgt_disp = evt.result.translations.get(TARGET_LANGUAGE, "")
             print(f"[Segment][Src] {src_disp}")
             print(f"[Segment][Tgt] {tgt_disp}")
-            # Optional: inspect detailed JSON for confidence/words like your STT daemon
             try:
                 payload = json.loads(evt.result.json)
-                # Example: print(payload)
             except Exception as ex:
                 pass
-            # Speak the translated text
             speak_text(synth, tgt_disp)
         elif evt.result.reason == speechsdk.ResultReason.RecognizedSpeech:
-            # Recognized but no translation (rare; e.g., language mismatch)
             print(f"[Segment][Src-only] {evt.result.text}")
         elif evt.result.reason == speechsdk.ResultReason.NoMatch:
             print("[Segment] NoMatch")

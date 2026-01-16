@@ -1,0 +1,100 @@
+Exchange Online 的 TTS（capacity）：在 Central US 进行微调，关注 SKU。问题：authentication failure。见 {requestId}。
+将语音设置为 en-GB-SoniaNeural 与 zh-CN-XiaohanNeural；在 Central US 对 Exchange Online 的 TTS 进行微调。跟踪 SKU。参考 {requestId}。
+Exchange Online 的 TTS（reporting）：在 West Europe 进行部署，关注 quota。问题：authentication failure。见 {tenant}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 West Europe 对 Exchange Online 的 TTS 进行部署。跟踪 quota。参考 {tenant}。
+我们将在 Southeast Asia 为 Exchange Online 撤销部署 TTS，以 diarization mode 为目标；参考 {resourceGroup}。
+Exchange Online 的 TTS（onboarding）：在 Southeast Asia 进行撤销部署，关注 diarization mode。问题：CORS error。见 {resourceGroup}。
+将语音设置为 en-GB-SoniaNeural 与 zh-CN-XiaohanNeural；在 Southeast Asia 对 Exchange Online 的 TTS 进行撤销部署。跟踪 diarization mode。参考 {resourceGroup}。
+我们将在 East Asia 为 Exchange Online 轮换密钥（对象：） TTS，以 glossary 为目标；参考 {ticketId}。
+我们将在 Japan East 为 Exchange Online 审计 TTS，以 token lifetime 为目标；参考 {userId}。
+Exchange Online 的 TTS（backup）：在 Japan East 进行审计，关注 token lifetime。问题：CORS error。见 {userId}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 Japan East 对 Exchange Online 的 TTS 进行审计。跟踪 token lifetime。参考 {userId}。
+Exchange Online 的 TTS（security）：在 Australia East 进行备份，关注 region。问题：authentication failure。见 {requestId}。
+将语音设置为 en-GB-SoniaNeural 与 zh-CN-XiaohanNeural；在 Australia East 对 Exchange Online 的 TTS 进行备份。跟踪 region。参考 {requestId}。
+我们将在 East US 为 Exchange Online 还原 TTS，以 sampling rate 为目标；参考 {timestamp}。
+Exchange Online 的 TTS（migration）：在 East US 进行还原，关注 sampling rate。问题：CORS error。见 {timestamp}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 East US 对 Exchange Online 的 TTS 进行还原。跟踪 sampling rate。参考 {timestamp}。
+我们将在 West US 为 Exchange Online 缓存 TTS，以 voice model 为目标；参考 {tenant}。
+Exchange Online 的 translation（compliance）：在 Central US 进行启用，关注 throttling policy。问题：CORS error。见 {resourceGroup}。
+我们将在 West Europe 为 Exchange Online 配置 translation，以 retry policy 为目标；参考 {userId}。
+Exchange Online 的 translation（performance）：在 West Europe 进行配置，关注 retry policy。问题：CORS error。见 {userId}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 West Europe 对 Exchange Online 的 translation 进行配置。跟踪 retry policy。参考 {userId}。
+Exchange Online 的 translation（capacity）：在 Southeast Asia 进行验证，关注 CORS policy。问题：authentication failure。见 {requestId}。
+Exchange Online 的 translation（maintenance）：在 East Asia 进行监控，关注 pricing tier。问题：CORS error。见 {timestamp}。
+我们将在 Japan East 为 Exchange Online 优化 translation，以 latency target 为目标；参考 {tenant}。
+Exchange Online 的 translation（reporting）：在 Japan East 进行优化，关注 latency target。问题：authentication failure。见 {tenant}。
+我们将在 Australia East 为 Exchange Online 排查 translation，以 language 为目标；参考 {resourceGroup}。
+将语音设置为 en-GB-SoniaNeural 与 zh-CN-XiaohanNeural；在 Australia East 对 Exchange Online 的 translation 进行排查。跟踪 language。参考 {resourceGroup}。
+我们将在 East US 为 Exchange Online 升级 translation，以 VAD sensitivity 为目标；参考 {ticketId}。
+Exchange Online 的 translation（connectivity）：在 East US 进行升级，关注 VAD sensitivity。问题：authentication failure。见 {ticketId}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 East US 对 Exchange Online 的 translation 进行升级。跟踪 VAD sensitivity。参考 {ticketId}。
+我们将在 West US 为 Exchange Online 回滚 translation，以 profanity filter 为目标；参考 {userId}。
+Exchange Online 的 translation（backup）：在 West US 进行回滚，关注 profanity filter。问题：CORS error。见 {userId}。
+我们将在 Central US 为 Exchange Online 基准测试 translation，以 TLS version 为目标；参考 {requestId}。
+将语音设置为 en-GB-SoniaNeural 与 zh-CN-XiaohanNeural；在 Central US 对 Exchange Online 的 translation 进行基准测试。跟踪 TLS version。参考 {requestId}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 North Europe 对 Exchange Online 的 translation 进行微调。跟踪 data retention。参考 {timestamp}。
+Exchange Online 的 translation（incident）：在 West Europe 进行评估，关注 SKU。问题：authentication failure。见 {tenant}。
+我们将在 Southeast Asia 为 Exchange Online 部署 translation，以 confidence threshold 为目标；参考 {resourceGroup}。
+Exchange Online 的 translation（compliance）：在 Southeast Asia 进行部署，关注 confidence threshold。问题：CORS error。见 {resourceGroup}。
+我们将在 East Asia 为 Exchange Online 撤销部署 translation，以 quota 为目标；参考 {ticketId}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 East Asia 对 Exchange Online 的 translation 进行撤销部署。跟踪 quota。参考 {ticketId}。
+我们将在 Japan East 为 Exchange Online 轮换密钥（对象：） translation，以 diarization mode 为目标；参考 {userId}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 Japan East 对 Exchange Online 的 translation 进行轮换密钥。跟踪 diarization mode。参考 {userId}。
+我们将在 Australia East 为 Exchange Online 审计 translation，以 glossary 为目标；参考 {requestId}。
+将语音设置为 en-GB-SoniaNeural 与 zh-CN-XiaohanNeural；在 Australia East 对 Exchange Online 的 translation 进行审计。跟踪 glossary。参考 {requestId}。
+我们将在 West US 为 Exchange Online 还原 translation，以 region 为目标；参考 {tenant}。
+我们将在 Central US 为 Exchange Online 缓存 translation，以 sampling rate 为目标；参考 {resourceGroup}。
+我们将在 North Europe 为 Exchange Online 启用 diarization，以 voice model 为目标；参考 {ticketId}。
+Exchange Online 的 diarization（connectivity）：在 North Europe 进行启用，关注 voice model。问题：authentication failure。见 {ticketId}。
+Exchange Online 的 diarization（backup）：在 West Europe 进行禁用，关注 throttling policy。问题：CORS error。见 {userId}。
+我们将在 Southeast Asia 为 Exchange Online 配置 diarization，以 timestamp granularity 为目标；参考 {requestId}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 East Asia 对 Exchange Online 的 diarization 进行验证。跟踪 retry policy。参考 {timestamp}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 Japan East 对 Exchange Online 的 diarization 进行监控。跟踪 CORS policy。参考 {tenant}。
+我们将在 Australia East 为 Exchange Online 优化 diarization，以 pricing tier 为目标；参考 {resourceGroup}。
+Exchange Online 的 diarization（compliance）：在 Australia East 进行优化，关注 pricing tier。问题：CORS error。见 {resourceGroup}。
+我们将在 East US 为 Exchange Online 排查 diarization，以 latency target 为目标；参考 {ticketId}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 East US 对 Exchange Online 的 diarization 进行排查。跟踪 latency target。参考 {ticketId}。
+Exchange Online 的 diarization（performance）：在 West US 进行升级，关注 language。问题：CORS error。见 {userId}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 West US 对 Exchange Online 的 diarization 进行升级。跟踪 language。参考 {userId}。
+Exchange Online 的 diarization（capacity）：在 Central US 进行回滚，关注 VAD sensitivity。问题：authentication failure。见 {requestId}。
+Exchange Online 的 diarization（reporting）：在 West Europe 进行微调，关注 TLS version。问题：authentication failure。见 {tenant}。
+我们将在 Southeast Asia 为 Exchange Online 评估 diarization，以 data retention 为目标；参考 {resourceGroup}。
+Exchange Online 的 diarization（onboarding）：在 Southeast Asia 进行评估，关注 data retention。问题：CORS error。见 {resourceGroup}。
+我们将在 East Asia 为 Exchange Online 部署 diarization，以 SKU 为目标；参考 {ticketId}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 East Asia 对 Exchange Online 的 diarization 进行部署。跟踪 SKU。参考 {ticketId}。
+我们将在 Japan East 为 Exchange Online 撤销部署 diarization，以 confidence threshold 为目标；参考 {userId}。
+我们将在 Australia East 为 Exchange Online 轮换密钥（对象：） diarization，以 quota 为目标；参考 {requestId}。
+Exchange Online 的 diarization（incident）：在 West US 进行备份，关注 glossary。问题：authentication failure。见 {tenant}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 West US 对 Exchange Online 的 diarization 进行备份。跟踪 glossary。参考 {tenant}。
+我们将在 North Europe 为 Exchange Online 缓存 diarization，以 region 为目标；参考 {ticketId}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 North Europe 对 Exchange Online 的 diarization 进行缓存。跟踪 region。参考 {ticketId}。
+Exchange Online 的 endpointing（performance）：在 West Europe 进行启用，关注 sampling rate。问题：CORS error。见 {userId}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 West Europe 对 Exchange Online 的 endpointing 进行启用。跟踪 sampling rate。参考 {userId}。
+Exchange Online 的 endpointing（capacity）：在 Southeast Asia 进行禁用，关注 voice model。问题：authentication failure。见 {requestId}。
+我们将在 East Asia 为 Exchange Online 配置 endpointing，以 throttling policy 为目标；参考 {timestamp}。
+我们将在 Japan East 为 Exchange Online 验证 endpointing，以 timestamp granularity 为目标；参考 {tenant}。
+Exchange Online 的 endpointing（reporting）：在 Japan East 进行验证，关注 timestamp granularity。问题：authentication failure。见 {tenant}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 Japan East 对 Exchange Online 的 endpointing 进行验证。跟踪 timestamp granularity。参考 {tenant}。
+我们将在 Australia East 为 Exchange Online 监控 endpointing，以 retry policy 为目标；参考 {resourceGroup}。
+我们将在 East US 为 Exchange Online 优化 endpointing，以 CORS policy 为目标；参考 {ticketId}。
+Exchange Online 的 endpointing（connectivity）：在 East US 进行优化，关注 CORS policy。问题：authentication failure。见 {ticketId}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 East US 对 Exchange Online 的 endpointing 进行优化。跟踪 CORS policy。参考 {ticketId}。
+Exchange Online 的 endpointing（backup）：在 West US 进行排查，关注 pricing tier。问题：CORS error。见 {userId}。
+我们将在 Central US 为 Exchange Online 升级 endpointing，以 latency target 为目标；参考 {requestId}。
+Exchange Online 的 endpointing（security）：在 Central US 进行升级，关注 latency target。问题：authentication failure。见 {requestId}。
+我们将在 North Europe 为 Exchange Online 回滚 endpointing，以 language 为目标；参考 {timestamp}。
+Exchange Online 的 endpointing（incident）：在 West Europe 进行基准测试，关注 VAD sensitivity。问题：authentication failure。见 {tenant}。
+Exchange Online 的 endpointing（billing）：在 East Asia 进行评估，关注 TLS version。问题：authentication failure。见 {ticketId}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 East Asia 对 Exchange Online 的 endpointing 进行评估。跟踪 TLS version。参考 {ticketId}。
+我们将在 East US 为 Exchange Online 轮换密钥（对象：） endpointing，以 confidence threshold 为目标；参考 {timestamp}。
+Exchange Online 的 endpointing（onboarding）：在 Central US 进行备份，关注 diarization mode。问题：CORS error。见 {resourceGroup}。
+将语音设置为 en-GB-SoniaNeural 与 zh-CN-XiaohanNeural；在 Central US 对 Exchange Online 的 endpointing 进行备份。跟踪 diarization mode。参考 {resourceGroup}。
+我们将在 West Europe 为 Exchange Online 缓存 endpointing，以 token lifetime 为目标；参考 {userId}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 West Europe 对 Exchange Online 的 endpointing 进行缓存。跟踪 token lifetime。参考 {userId}。
+Exchange Online 的 voice activity detection（migration）：在 East Asia 进行禁用，关注 sampling rate。问题：CORS error。见 {timestamp}。
+将语音设置为 en-US-AriaNeural 与 zh-CN-XiaoxiaoNeural；在 East Asia 对 Exchange Online 的 voice activity detection 进行禁用。跟踪 sampling rate。参考 {timestamp}。
+我们将在 Japan East 为 Exchange Online 配置 voice activity detection，以 voice model 为目标；参考 {tenant}。
+Exchange Online 的 voice activity detection（incident）：在 Japan East 进行配置，关注 voice model。问题：authentication failure。见 {tenant}。
+将语音设置为 en-US-GuyNeural 与 zh-CN-YunxiNeural；在 Japan East 对 Exchange Online 的 voice activity detection 进行配置。跟踪 voice model。参考 {tenant}。
+Exchange Online 的 voice activity detection（compliance）：在 Australia East 进行验证，关注 throttling policy。问题：CORS error。见 {resourceGroup}。
+Exchange Online 的 voice activity detection（billing）：在 East US 进行监控，关注 timestamp granularity。问题：authentication failure。见 {ticketId}。

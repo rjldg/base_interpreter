@@ -7,7 +7,14 @@ from pathlib import Path
 from typing import Optional
 from dotenv import load_dotenv
 
+import requests
+import uuid
+
+
 import azure.cognitiveservices.speech as speechsdk
+
+from interpreter import CATEGORY_ENDPOINT_ID
+from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv()
 
@@ -18,8 +25,11 @@ SPEECH_REGION = os.getenv("SPEECH_REGION", "")
 #CUSTOM_ENDPOINT_ID = os.getenv("CUSTOM_ENDPOINT_ID", "")
 #CUSTOM_ENDPOINT_KEY = os.getenv("CUSTOM_ENDPOINT_KEY", "")
 
-CUSTOM_ENDPOINT_KEY = ""
-CATEGORY_ENDPOINT_ID = ""
+# Translator (Custom model)
+TRANSLATOR_KEY = os.getenv("TRANSLATOR_KEY", "")
+TRANSLATOR_REGION = os.getenv("TRANSLATOR_REGION", "")
+TRANSLATOR_ENDPOINT = os.getenv("TRANSLATOR_ENDPOINT", "https://api.cognitive.microsofttranslator.com")
+TRANSLATOR_CATEGORY_ID = os.getenv("TRANSLATOR_CATEGORY_ID", "")
 
 # Source/Target
 LOCALE = os.getenv("LOCALE", "en-US")
@@ -39,37 +49,46 @@ SEG_INIT_SILENCE_TIMEOUT = os.getenv("SEGMENTATION_INIT_SILENCE_TIMEOUT_MS", "80
 SEG_END_SILENCE_TIMEOUT = os.getenv("SEGMENTATION_END_SILENCE_TIMEOUT_MS", "800")
 
 _synth_lock = threading.Lock()
+_translate_pool = ThreadPoolExecutor(max_workers=2)
+
+# ============================================================
+#  Custom text translation function (Category ID is used with the Translator Text API (v3) via the category= query parameter, 
+#  not via SpeechTranslationConfig.)
+# ============================================================
+def translate_text_custom(text: str, *, from_lang: str, to_lang: str) -> str:
+    if not text:
+        return ""
+
+    if not (TRANSLATOR_KEY and TRANSLATOR_REGION and TRANSLATOR_CATEGORY_ID):
+        raise RuntimeError("Set TRANSLATOR_KEY, TRANSLATOR_REGION, and TRANSLATOR_CATEGORY_ID in .env")
+
+    url = f"{TRANSLATOR_ENDPOINT}/translate"
+    params = {
+        "api-version": "3.0",
+        "from": from_lang,
+        "to": to_lang,
+        "category": TRANSLATOR_CATEGORY_ID,  # <-- Custom model hook [1](https://learn.microsoft.com/en-us/azure/ai-services/translator/custom-translator/how-to/translate-with-custom-model)[2](https://learn.microsoft.com/en-us/azure/ai-services/translator/custom-translator/azure-ai-foundry/how-to/translate-with-model)
+    }
+    headers = {
+        "Ocp-Apim-Subscription-Key": TRANSLATOR_KEY,
+        "Ocp-Apim-Subscription-Region": TRANSLATOR_REGION,
+        "Content-Type": "application/json",
+        "X-ClientTraceId": str(uuid.uuid4()),
+    }
+    body = [{"text": text}]
+
+    resp = requests.post(url, params=params, headers=headers, json=body, timeout=15)
+    resp.raise_for_status()
+
+    data = resp.json()
+    return data[0]["translations"][0]["text"]
+
 
 # ============================================================
 # Config builders
 # ============================================================
 def _resolve_subscription_key() -> str:
-    return CUSTOM_ENDPOINT_KEY or SPEECH_KEY
-
-def build_translation_config() -> speechsdk.translation.SpeechTranslationConfig:
-    key = _resolve_subscription_key()
-    if not key or not SPEECH_REGION:
-        raise RuntimeError("Set SPEECH_KEY (or CUSTOM_ENDPOINT_KEY) and SPEECH_REGION in .env")
-
-    tcfg = speechsdk.translation.SpeechTranslationConfig(
-        subscription=key,
-        region=SPEECH_REGION,
-    )
-
-    tcfg.speech_recognition_language = LOCALE
-
-    tcfg.add_target_language(TARGET_LANGUAGE)
-
-    tcfg.set_property(speechsdk.PropertyId.Speech_SegmentationStrategy, SEG_STRAT)
-    tcfg.set_property(speechsdk.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, SEG_INIT_SILENCE_TIMEOUT)
-    tcfg.set_property(speechsdk.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, SEG_END_SILENCE_TIMEOUT)
-
-    tcfg.set_profanity(speechsdk.ProfanityOption.Masked)
-
-    if CATEGORY_ENDPOINT_ID:
-        tcfg.endpoint_id = CATEGORY_ENDPOINT_ID
-
-    return tcfg
+    return TRANSLATOR_KEY or SPEECH_KEY
 
 def build_synthesizer() -> speechsdk.SpeechSynthesizer:
     if not _resolve_subscription_key() or not SPEECH_REGION:
@@ -106,31 +125,41 @@ def speak_text(synth: speechsdk.SpeechSynthesizer, text: str):
 def interpret_microphone():
     print(f"[Interpreter] Mic mode. Source={LOCALE} → Target={TARGET_LANGUAGE}")
     print(f"[Segmentation] Strategy={SEG_STRAT}, SilenceTimeout=[Init:{SEG_INIT_SILENCE_TIMEOUT}ms, End:{SEG_END_SILENCE_TIMEOUT}ms]")
-    tcfg = build_translation_config()
+    
+    scfg = speechsdk.SpeechConfig(subscription=_resolve_subscription_key(), region=SPEECH_REGION)
+    scfg.speech_recognition_language = LOCALE
     audio_in = speechsdk.AudioConfig(use_default_microphone=True)
-    trec = speechsdk.translation.TranslationRecognizer(translation_config=tcfg, audio_config=audio_in)
+    trec = speechsdk.SpeechRecognizer(speech_config=scfg, audio_config=audio_in)
+
 
     synth = build_synthesizer()
 
-    def recognizing_cb(evt: speechsdk.translation.TranslationRecognitionEventArgs):
-        if evt.result.reason == speechsdk.ResultReason.TranslatingSpeech:
-            partial = evt.result.translations.get(TARGET_LANGUAGE, "")
-            if partial:
-                print(f" [Interim] {partial}")
+    
+    def recognizing_cb(evt: speechsdk.SpeechRecognitionEventArgs):
+        if evt.result.reason == speechsdk.ResultReason.RecognizingSpeech:
+            if evt.result.text:
+                print(f" [Interim][Src] {evt.result.text}")
 
-    def recognized_cb(evt: speechsdk.translation.TranslationRecognitionEventArgs):
-        if evt.result.reason == speechsdk.ResultReason.TranslatedSpeech:
+    def recognized_cb(evt: speechsdk.SpeechRecognitionEventArgs):
+        if evt.result.reason == speechsdk.ResultReason.RecognizedSpeech:
             src_disp = evt.result.text or ""
-            tgt_disp = evt.result.translations.get(TARGET_LANGUAGE, "")
             print(f"[Segment][Src] {src_disp}")
-            print(f"[Segment][Tgt] {tgt_disp}")
-            try:
-                payload = json.loads(evt.result.json)
-            except Exception as ex:
-                pass
-            speak_text(synth, tgt_disp)
-        elif evt.result.reason == speechsdk.ResultReason.RecognizedSpeech:
-            print(f"[Segment][Src-only] {evt.result.text}")
+
+            # Offload translation + TTS to background thread to prevent freezing
+            def _do_translate_and_speak(text: str):
+                try:
+                    tgt_disp = translate_text_custom(
+                        text,
+                        from_lang=LOCALE.split("-")[0],
+                        to_lang=TARGET_LANGUAGE.split("-")[0],
+                    )
+                    print(f"[Segment][Tgt] {tgt_disp}")
+                    speak_text(synth, tgt_disp)
+                except Exception as e:
+                    print(f"[Translate] ERROR: {e}")
+
+            _translate_pool.submit(_do_translate_and_speak, src_disp)
+
         elif evt.result.reason == speechsdk.ResultReason.NoMatch:
             print("[Segment] NoMatch")
 
@@ -164,26 +193,44 @@ def interpret_microphone():
 # ============================================================
 def interpret_file(audio_path: Path):
     print(f"[Interpreter] File: {audio_path.name}  Source={LOCALE} → Target={TARGET_LANGUAGE}")
-    tcfg = build_translation_config()
+    
+
+    scfg = speechsdk.SpeechConfig(subscription=_resolve_subscription_key(), region=SPEECH_REGION)
+    scfg.speech_recognition_language = LOCALE
     audio_in = speechsdk.AudioConfig(filename=str(audio_path))
-    trec = speechsdk.translation.TranslationRecognizer(translation_config=tcfg, audio_config=audio_in)
+    trec = speechsdk.SpeechRecognizer(speech_config=scfg, audio_config=audio_in)
+
 
     synth = build_synthesizer()
 
-    def recognizing_cb(evt: speechsdk.translation.TranslationRecognitionEventArgs):
-        if evt.result.reason == speechsdk.ResultReason.TranslatingSpeech:
-            partial = evt.result.translations.get(TARGET_LANGUAGE, "")
-            if partial:
-                print(f" [Interim] {partial}")
 
-    def recognized_cb(evt: speechsdk.translation.TranslationRecognitionEventArgs):
-        if evt.result.reason == speechsdk.ResultReason.TranslatedSpeech:
+    def recognizing_cb(evt: speechsdk.SpeechRecognitionEventArgs):
+        if evt.result.reason == speechsdk.ResultReason.RecognizingSpeech:
+            if evt.result.text:
+                print(f" [Interim][Src] {evt.result.text}")
+
+    def recognized_cb(evt: speechsdk.SpeechRecognitionEventArgs):
+        if evt.result.reason == speechsdk.ResultReason.RecognizedSpeech:
             src_disp = evt.result.text or ""
-            tgt_disp = evt.result.translations.get(TARGET_LANGUAGE, "")
             print(f"[Segment][Src] {src_disp}")
-            print(f"[Segment][Tgt] {tgt_disp}")
-            # Speak the translated text for each finalized segment
-            speak_text(synth, tgt_disp)
+
+            # Offload translation + TTS to background thread to prevent freezing
+            def _do_translate_and_speak(text: str):
+                try:
+                    tgt_disp = translate_text_custom(
+                        text,
+                        from_lang=LOCALE.split("-")[0],
+                        to_lang=TARGET_LANGUAGE.split("-")[0],
+                    )
+                    print(f"[Segment][Tgt] {tgt_disp}")
+                    speak_text(synth, tgt_disp)
+                except Exception as e:
+                    print(f"[Translate] ERROR: {e}")
+
+            _translate_pool.submit(_do_translate_and_speak, src_disp)
+
+        elif evt.result.reason == speechsdk.ResultReason.NoMatch:
+            print("[Segment] NoMatch")
 
     def canceled_cb(evt: speechsdk.SpeechRecognitionCanceledEventArgs):
         print(f"[Canceled] {evt.reason} {evt.error_details}")

@@ -18,8 +18,8 @@ SPEECH_REGION = os.getenv("SPEECH_REGION", "")
 #CUSTOM_ENDPOINT_ID = os.getenv("CUSTOM_ENDPOINT_ID", "")
 #CUSTOM_ENDPOINT_KEY = os.getenv("CUSTOM_ENDPOINT_KEY", "")
 
-CUSTOM_ENDPOINT_ID = ""
 CUSTOM_ENDPOINT_KEY = ""
+CATEGORY_ENDPOINT_ID = os.getenv("CATEGORY_ENDPOINT_ID", "")
 
 # Source/Target
 LOCALE = os.getenv("LOCALE", "en-US")
@@ -66,8 +66,8 @@ def build_translation_config() -> speechsdk.translation.SpeechTranslationConfig:
 
     tcfg.set_profanity(speechsdk.ProfanityOption.Masked)
 
-    if CUSTOM_ENDPOINT_ID:
-        tcfg.endpoint_id = CUSTOM_ENDPOINT_ID
+    if CATEGORY_ENDPOINT_ID:
+        tcfg.endpoint_id = CATEGORY_ENDPOINT_ID
 
     return tcfg
 
